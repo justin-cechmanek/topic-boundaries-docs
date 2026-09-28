@@ -147,13 +147,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../examples/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="../api/index.html">
     API
   </a>
@@ -249,13 +242,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../user_guide/index.html">
     User Guides
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../examples/index.html">
-    Examples
   </a>
 </li>
 
@@ -379,8 +365,8 @@
 </section>
 <section id="index-schema">
 <h2>Index schema<a class="headerlink" href="#index-schema" title="Link to this heading">#</a></h2>
-<p>The bundled <code class="docutils literal notranslate"><span class="pre">topic_boundaries/schema.yml</span></code> defines an HNSW vector index with a <code class="docutils literal notranslate"><span class="pre">cluster_id</span></code> tag and cosine distance. The pipeline adjusts the vector field’s dimensions to match the embedder. Pass <code class="docutils literal notranslate"><span class="pre">schema_path</span></code> to <code class="docutils literal notranslate"><span class="pre">run_pipeline</span></code> to load a different schema, including one with L2 distance.</p>
-<p>The distance metric affects the meaning of a score. For example, <code class="docutils literal notranslate"><span class="pre">max_distance_rankings</span></code> reads the configured metric: bounded cosine queries can search from the negated centroid, while L2 queries rank an exhaustive filtered result. For L2, it converts Redis’s squared score to Euclidean distance.</p>
+<p>The bundled <code class="docutils literal notranslate"><span class="pre">topic_boundaries/schema.yml</span></code> defines an HNSW vector index with a <code class="docutils literal notranslate"><span class="pre">cluster_id</span></code> tag and cosine distance. The pipeline adjusts the vector field’s dimensions to match the embedder. Pass <code class="docutils literal notranslate"><span class="pre">schema_path</span></code> to <code class="docutils literal notranslate"><span class="pre">run_pipeline</span></code> to load a different schema. Redis uses <code class="docutils literal notranslate"><span class="pre">L2</span></code> as the schema value for Euclidean distance.</p>
+<p>The distance metric affects the meaning of a score. For example, <code class="docutils literal notranslate"><span class="pre">max_distance_rankings</span></code> reads the configured metric: bounded cosine queries can search from the negated centroid, while Euclidean queries rank all matching cluster vectors and return Euclidean distances.</p>
 </section>
 <section id="what-the-methods-share">
 <h2>What the methods share<a class="headerlink" href="#what-the-methods-share" title="Link to this heading">#</a></h2>

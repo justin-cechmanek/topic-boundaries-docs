@@ -146,13 +146,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="examples/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="api/index.html">
     API
   </a>
@@ -255,13 +248,6 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="examples/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
   <a class="nav-link nav-internal" href="api/index.html">
     API
   </a>
@@ -321,6 +307,7 @@
 <h1>Topic Boundaries<a class="headerlink" href="#topic-boundaries" title="Link to this heading">#</a></h1>
 <p>Find documents near the edges of clusters in a text corpus or another vector space.</p>
 <p>Topic Boundaries loads data, creates embeddings or accepts vectors you already have, clusters them with K-means, and offers several ways to rank boundary documents.</p>
+<!-- TODO: Justin to expand this introduction with insights and reasons to use the library. -->
 <section id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h2>
 <p>From the repository root, install the package and start the local Redis Stack:</p>
@@ -351,7 +338,7 @@ docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> 
     <span class="nb">print</span><span class="p">(</span><span class="n">hit</span><span class="o">.</span><span class="n">cluster_id</span><span class="p">,</span> <span class="n">hit</span><span class="o">.</span><span class="n">doc_id</span><span class="p">,</span> <span class="n">hit</span><span class="o">.</span><span class="n">distance</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The first run may download the embedding model. See <a class="reference internal" href="user_guide/getting_started.html"><span class="std std-doc">Getting Started</span></a> for a walkthrough, or <a class="reference internal" href="examples/precomputed_vectors.html"><span class="std std-doc">Precomputed Vectors</span></a> to use vectors without a model download.</p>
+<p>The first run may download the embedding model. See <a class="reference internal" href="user_guide/getting_started.html"><span class="std std-doc">Getting Started</span></a> for a walkthrough, or <a class="reference internal" href="user_guide/data_sources.html"><span class="std std-doc">Data Sources</span></a> to supply your own vectors.</p>
 </section>
 <section id="explore-the-docs">
 <h2>Explore the Docs<a class="headerlink" href="#explore-the-docs" title="Link to this heading">#</a></h2>
@@ -366,11 +353,6 @@ docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> 
 :link: user_guide/index
 :link-type: doc</p>
 <p>Install the project, load data, and run an analysis.
-:::</p>
-<p>:::{grid-item-card} 💡 Examples
-:link: examples/index
-:link-type: doc</p>
-<p>Start with a complete vector-only example.
 :::</p>
 <p>:::{grid-item-card} 📚 API Reference
 :link: api/index
