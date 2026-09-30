@@ -354,32 +354,41 @@
   <section id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
 <p>This walkthrough uses the 20 records in <code class="docutils literal notranslate"><span class="pre">datasets/sample.jsonl</span></code>. Run it from the repository root after <a class="reference internal" href="installation.html"><span class="std std-doc">installing the package and starting Redis</span></a>.</p>
-<section id="load-records-and-run-the-pipeline">
-<h2>Load records and run the pipeline<a class="headerlink" href="#load-records-and-run-the-pipeline" title="Link to this heading">#</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">topic_boundaries</span><span class="w"> </span><span class="kn">import</span> <span class="n">JsonlSource</span><span class="p">,</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">run_pipeline</span>
+<section id="load-cluster-and-index-records">
+<h2>Load, cluster, and index records<a class="headerlink" href="#load-cluster-and-index-records" title="Link to this heading">#</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">topic_boundaries</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">JsonlSource</span><span class="p">,</span>
+    <span class="n">Settings</span><span class="p">,</span>
+    <span class="n">embed_and_cluster_datapoints</span><span class="p">,</span>
+    <span class="n">index_clustered_datapoints</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">settings</span> <span class="o">=</span> <span class="n">Settings</span><span class="o">.</span><span class="n">from_config</span><span class="p">()</span>
 <span class="n">datapoints</span> <span class="o">=</span> <span class="n">JsonlSource</span><span class="p">(</span><span class="s2">"datasets/sample.jsonl"</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">run_pipeline</span><span class="p">(</span>
+<span class="n">vectors</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">centroids</span> <span class="o">=</span> <span class="n">embed_and_cluster_datapoints</span><span class="p">(</span>
     <span class="n">datapoints</span><span class="p">,</span>
-    <span class="n">redis_url</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">redis_url</span><span class="p">,</span>
     <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">embedding_model</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">embedding_model</span><span class="p">,</span>
-    <span class="n">schema_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">index_clustered_datapoints</span><span class="p">(</span>
+    <span class="n">datapoints</span><span class="p">,</span>
+    <span class="n">vectors</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">,</span>
+    <span class="n">redis_url</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">redis_url</span><span class="p">,</span>
     <span class="n">overwrite_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">state.labels[i]</span></code> is the cluster for <code class="docutils literal notranslate"><span class="pre">state.datapoints[i]</span></code>; <code class="docutils literal notranslate"><span class="pre">state.centroids</span></code> contains one vector per cluster. <code class="docutils literal notranslate"><span class="pre">overwrite_index=True</span></code> recreates the configured Redis index. Use a dedicated index name if you need to preserve an existing index.</p>
+<p><code class="docutils literal notranslate"><span class="pre">labels[i]</span></code> is the cluster for <code class="docutils literal notranslate"><span class="pre">datapoints[i]</span></code>; <code class="docutils literal notranslate"><span class="pre">centroids</span></code> contains one vector per cluster. <code class="docutils literal notranslate"><span class="pre">overwrite_index=True</span></code> recreates the configured Redis index. Use a dedicated index name if you need to preserve an existing index.</p>
 </section>
 <section id="rank-boundary-documents">
 <h2>Rank boundary documents<a class="headerlink" href="#rank-boundary-documents" title="Link to this heading">#</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">topic_boundaries</span><span class="w"> </span><span class="kn">import</span> <span class="n">max_distance_rankings</span>
 
 <span class="n">hits</span> <span class="o">=</span> <span class="n">max_distance_rankings</span><span class="p">(</span>
-    <span class="n">state</span><span class="o">.</span><span class="n">indexed</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-    <span class="n">state</span><span class="o">.</span><span class="n">centroids</span><span class="p">,</span>
-    <span class="n">state</span><span class="o">.</span><span class="n">indexed</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">,</span>
+    <span class="n">index</span><span class="p">,</span>
+    <span class="n">centroids</span><span class="p">,</span>
+    <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">top_n_per_cluster</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">hits</span><span class="p">:</span>
@@ -394,11 +403,11 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">topic_boundaries</span><span class="w"> </span><span class="kn">import</span> <span class="n">voronoi_rankings</span>
 
 <span class="n">hits</span> <span class="o">=</span> <span class="n">voronoi_rankings</span><span class="p">(</span>
-    <span class="n">state</span><span class="o">.</span><span class="n">datapoints</span><span class="p">,</span>
-    <span class="n">state</span><span class="o">.</span><span class="n">vectors</span><span class="p">,</span>
-    <span class="n">state</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span>
-    <span class="n">state</span><span class="o">.</span><span class="n">centroids</span><span class="p">,</span>
-    <span class="n">state</span><span class="o">.</span><span class="n">indexed</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">,</span>
+    <span class="n">datapoints</span><span class="p">,</span>
+    <span class="n">vectors</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">,</span>
+    <span class="n">centroids</span><span class="p">,</span>
+    <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">top_n_per_cluster</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
@@ -454,7 +463,7 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-records-and-run-the-pipeline">Load records and run the pipeline</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-cluster-and-index-records">Load, cluster, and index records</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rank-boundary-documents">Rank boundary documents</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#try-another-method">Try another method</a></li>
 </ul>
